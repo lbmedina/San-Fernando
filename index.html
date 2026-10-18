@@ -48,6 +48,13 @@ ul.list li:first-child{border-top:0}
 a.btn{display:inline-block;background:var(--water);color:var(--bg);text-decoration:none;font-weight:700;padding:8px 14px;border-radius:8px}
 a.lk{color:var(--water);font-weight:600}
 .warn{border-left:4px solid var(--water);padding:8px 12px;background:var(--surf);font-size:.9rem;color:var(--mut);margin-top:20px}
+.ck{list-style:none;margin:0;padding:0}
+.ck li{padding:7px 0;border-top:1px solid var(--line)}.ck li:first-child{border-top:0}
+.ck label{display:flex;gap:10px;align-items:flex-start;margin:0;font-weight:500;font-size:1rem;cursor:pointer}
+.ck input{margin-top:5px;width:18px;height:18px;flex:none}
+.ck input:checked+span{color:var(--mut);text-decoration:line-through}
+.h3{font-size:.95rem;font-weight:700;margin:14px 0 4px}
+.call{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
 .save{font:inherit;font-weight:700;background:var(--water);color:var(--bg);border:0;border-radius:8px;padding:10px 16px;cursor:pointer;margin-top:12px}
 </style>
 </head>
@@ -59,7 +66,7 @@ a.lk{color:var(--water);font-weight:600}
 <button role="tab" aria-selected="true" data-t="nivel">Nivel del río</button>
 <button role="tab" aria-selected="false" data-t="contactos">Contactos</button>
 <button role="tab" aria-selected="false" data-t="fuentes">Fuentes oficiales</button>
-<button role="tab" aria-selected="false" data-t="plan">Mi plan</button>
+<button role="tab" aria-selected="false" data-t="plan">Evacuación</button>
 </nav>
 
 <section id="nivel">
@@ -130,15 +137,12 @@ a.lk{color:var(--water);font-weight:600}
 </section>
 
 <section id="plan" hidden>
-<div class="panel"><h2>Mi plan de evacuación</h2>
-<p class="note" style="margin-top:0">Se guarda solo en este dispositivo.</p>
-<label for="p1">Punto de encuentro</label><textarea id="p1"></textarea>
-<label for="p2">Ruta de salida principal</label><textarea id="p2"></textarea>
-<label for="p3">Ruta alternativa</label><textarea id="p3"></textarea>
-<label for="p4">Personas a avisar (nombre y teléfono)</label><textarea id="p4"></textarea>
-<label for="p5">Qué llevar (documentos, medicación, linterna)</label><textarea id="p5"></textarea>
-<button class="save" id="sv">Guardar plan</button> <span class="note" id="ok"></span>
-</div></section>
+<div class="panel"><h2>Si tenés que evacuar: lo esencial</h2>
+<p class="note" style="margin-top:0">Seguí siempre las indicaciones de Defensa Civil. Tildá lo que ya tenés listo: se guarda solo en este dispositivo.</p>
+<div class="call"><a class="btn" href="tel:103">Defensa Civil 103</a><a class="btn" href="tel:106">Prefectura 106 (en el agua)</a></div>
+<div id="ckbox"></div>
+</div>
+</section>
 
 <p class="warn">Herramienta orientativa. No reemplaza los avisos del SHN, del SMN ni de Defensa Civil. Ante una emergencia llamá al 103 o al 106.</p>
 
@@ -185,7 +189,8 @@ var l=m>=u[2]?3:m>=u[1]?2:m>=u[0]?1:0;
 r.className="res l"+l;
 var x=msg[l][1];
 if($("sudeste").checked&&l<3&&m>=u[0]-0.3)x+=" Con viento sudeste sostenido la altura puede seguir subiendo.";
-r.innerHTML="<strong>"+msg[l][0]+": "+fm(m)+" m</strong><p>"+x+"</p>";
+r.innerHTML="<strong>"+msg[l][0]+": "+fm(m)+" m</strong><p>"+x+"</p>"+(l>=2?"<p><button class=\"save\" id=\"vlp\" style=\"margin-top:4px\">Ver qué hacer y qué llevar</button></p>":"");
+var vb=$("vlp");if(vb)vb.addEventListener("click",function(){document.querySelector("nav button[data-t=plan]").click();window.scrollTo(0,0)});
 var h=$("hora").value.match(/^(\d{1,2}):(\d{2})$/);
 if(h&&p!==null){var hh=(parseInt(h[1],10)+1)%24;t.textContent="Pico previsto de "+fm(p)+" m a las "+h[1].padStart(2,"0")+":"+h[2]+" en San Fernando. En Tigre y la primera sección del Delta, hacia las "+String(hh).padStart(2,"0")+":"+h[2]+"."}else t.textContent="";
 }
@@ -219,11 +224,42 @@ upd();
 }
 datos();setInterval(datos,600000);
 
+var CK=[
+["Antes de salir, si hay tiempo",[
+"Cortar la luz y el gas desde la llave general, solo si el lugar está seco",
+"Subir a lugares altos objetos de valor, electrodomésticos y documentos que no te llevás",
+"Cerrar puertas y ventanas con llave",
+"Avisar a un familiar o vecino adónde vas"]],
+["Qué llevar",[
+"Documentos (DNI, papeles de la casa), en una bolsa impermeable",
+"Medicación de todos y recetas",
+"Teléfono, cargador y batería externa",
+"Linterna y radio a pilas, con pilas de repuesto",
+"Agua potable y comida que no se eche a perder",
+"Ropa de abrigo, ropa seca de cambio y calzado cerrado",
+"Dinero en efectivo y llaves",
+"Lo necesario para niños, personas mayores y mascotas"]],
+["Mientras te trasladás",[
+"No cruces calles anegadas ni agua en movimiento, ni caminando ni en auto",
+"No te acerques a cables caídos ni a postes, y no toques tomas de corriente con las manos mojadas",
+"En el Delta, viajá en lancha y con chaleco salvavidas puesto",
+"Ayudá primero a niños, personas mayores y personas con movilidad reducida",
+"Andá al punto que indique Defensa Civil"]],
+["Después",[
+"No vuelvas hasta que las autoridades lo indiquen",
+"No uses la electricidad ni el gas hasta que los revise un técnico si hubo agua adentro"]]];
+function ckBuild(){
+var box=$("ckbox"),h="",n=0;
+CK.forEach(function(g){h+="<p class=\"h3\">"+g[0]+"</p><ul class=\"ck\">";
+g[1].forEach(function(t){var id="ck"+n++;h+="<li><label><input type=\"checkbox\" data-k=\""+id+"\""+(ld("k_"+id,"0")==="1"?" checked":"")+"><span>"+esc(t)+"</span></label></li>"});h+="</ul>"});
+box.innerHTML=h;
+box.addEventListener("change",function(e){var k=e.target.getAttribute&&e.target.getAttribute("data-k");if(k)sv("k_"+k,e.target.checked?"1":"0")});
+}
+ckBuild();
+
 var tabs=document.querySelectorAll("nav button");
 tabs.forEach(function(b){b.addEventListener("click",function(){
 tabs.forEach(function(o){o.setAttribute("aria-selected",o===b?"true":"false");$(o.dataset.t).hidden=o!==b})})});
-["p1","p2","p3","p4","p5"].forEach(function(i){$(i).value=ld("p_"+i,"")});
-$("sv").addEventListener("click",function(){["p1","p2","p3","p4","p5"].forEach(function(i){sv("p_"+i,$(i).value)});$("ok").textContent="Plan guardado en este dispositivo.";setTimeout(function(){$("ok").textContent=""},3000)});
 </script>
 </body>
 </html>
