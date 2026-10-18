@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alerta de crecida: San Fernando, Tigre y Delta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@85..100,400..800&display=swap">
+<style>
+:root{--bg:#eef3f4;--surf:#fff;--ink:#12262b;--mut:#4d6469;--line:#c9d6d9;--water:#1f6f7a;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1c20;--surf:#16282d;--ink:#e6f0f2;--mut:#9db4b9;--line:#2b434a;--water:#5fb3bf;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1c20;--surf:#16282d;--ink:#e6f0f2;--mut:#9db4b9;--line:#2b434a;--water:#5fb3bf;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Archivo",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;max-width:900px;margin-inline:auto;padding:0 16px 48px}
+h1{font-size:1.5rem;line-height:1.15;margin:20px 0 4px;font-weight:800;font-stretch:88%}
+h2{font-size:1.1rem;margin:0 0 10px;font-weight:700}
+.sub{color:var(--mut);margin:0 0 16px;max-width:60ch}
+nav{display:flex;gap:6px;overflow-x:auto;border-bottom:2px solid var(--line);margin-bottom:16px}
+nav button{background:none;border:0;color:var(--mut);font:inherit;font-weight:600;padding:10px 12px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--water)}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--water);outline-offset:2px}
+section[hidden]{display:none}
+.panel{background:var(--surf);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:start}
+@media (max-width:560px){.grid{grid-template-columns:1fr}.gauge{max-width:150px}}
+.gauge svg{width:100%;height:auto;display:block}
+.gauge .tk{stroke:var(--mut);stroke-width:1}
+.gauge .lb{fill:var(--mut);font-size:9px}
+.gauge .tr{fill:var(--surf);stroke:var(--line)}
+.gauge .wt{fill:var(--water);opacity:.28}
+label{display:block;font-weight:600;font-size:.9rem;margin:10px 0 4px}
+input[type=text],textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px}
+textarea{min-height:64px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chk{display:flex;gap:8px;align-items:center;font-weight:500;margin-top:12px}
+.res{border-radius:10px;padding:14px 16px;margin-top:14px;background:var(--lvbg);color:var(--lvfg)}
+.res strong{display:block;font-size:1.6rem;font-weight:800;font-stretch:88%;line-height:1.1}
+.res p{margin:6px 0 0}
+.l0{--lvbg:#1f7a4a;--lvfg:#fff}.l1{--lvbg:#f2c230;--lvfg:#1c1a10}.l2{--lvbg:#d8641c;--lvfg:#fff}.l3{--lvbg:#b3261e;--lvfg:#fff}
+.note{color:var(--mut);font-size:.88rem;margin:8px 0 0}
+details{margin-top:12px}summary{cursor:pointer;font-weight:600}
+ul.list{list-style:none;margin:0;padding:0}
+ul.list li{padding:10px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+ul.list li:first-child{border-top:0}
+.who{font-weight:600}.who small{display:block;font-weight:400;color:var(--mut)}
+a.btn{display:inline-block;background:var(--water);color:var(--bg);text-decoration:none;font-weight:700;padding:8px 14px;border-radius:8px}
+a.lk{color:var(--water);font-weight:600}
+.warn{border-left:4px solid var(--water);padding:8px 12px;background:var(--surf);font-size:.9rem;color:var(--mut);margin-top:20px}
+.save{font:inherit;font-weight:700;background:var(--water);color:var(--bg);border:0;border-radius:8px;padding:10px 16px;cursor:pointer;margin-top:12px}
+</style>
+</head>
+<body>
+<h1>Alerta de crecida: San Fernando, Tigre y Delta</h1>
+<p class="sub">La altura se actualiza sola desde el Servicio de Hidrografía Naval. La escala muestra qué tan cerca estás de los umbrales del INA.</p>
+
+<nav role="tablist" aria-label="Secciones">
+<button role="tab" aria-selected="true" data-t="nivel">Nivel del río</button>
+<button role="tab" aria-selected="false" data-t="contactos">Contactos</button>
+<button role="tab" aria-selected="false" data-t="fuentes">Fuentes oficiales</button>
+<button role="tab" aria-selected="false" data-t="plan">Mi plan</button>
+</nav>
+
+<section id="nivel">
+<div class="panel grid">
+<div class="gauge"><svg id="g" viewBox="0 0 150 310" role="img" aria-label="Escala de altura en San Fernando"></svg></div>
+<div>
+<h2>Estación de referencia: San Fernando</h2>
+<p class="note" id="est" style="margin:0 0 6px">Consultando fuentes oficiales…</p>
+<div id="tend" class="note" style="margin:0 0 6px"></div>
+<div class="row">
+<div><label for="act">Altura actual (m, SHN)</label><input type="text" id="act" inputmode="decimal" placeholder="2,40"></div>
+<div><label for="pico">Pico previsto (m, opcional)</label><input type="text" id="pico" inputmode="decimal" placeholder="3,10"></div>
+</div>
+<label for="hora">Hora del pico (HH:MM)</label>
+<input type="text" id="hora" inputmode="numeric" placeholder="14:30" maxlength="5" style="max-width:140px">
+<label class="chk"><input type="checkbox" id="sudeste"> Viento sudeste sostenido en el pronóstico</label>
+<div id="res" class="res l0" aria-live="polite"></div>
+<p class="note" id="tig"></p>
+<div id="avisos"></div>
+<details><summary>Umbrales (editables)</summary>
+<div class="row">
+<div><label for="u1">Atención (m)</label><input type="text" id="u1" inputmode="decimal"></div>
+<div><label for="u2">Alerta (m)</label><input type="text" id="u2" inputmode="decimal"></div>
+<div><label for="u3">Evacuación (m)</label><input type="text" id="u3" inputmode="decimal"></div>
+</div>
+<p class="note">Alerta 3,00 m y evacuación 3,50 m son los valores que el INA informa para San Fernando. El umbral de atención (2,50 m) es una propuesta propia, no oficial. Confirmá los valores con Defensa Civil.</p>
+</details>
+</div>
+</div>
+<p class="note">Tigre y la primera sección del Delta repiten la altura de San Fernando con cerca de una hora de demora, según un aviso del SHN. Escobar e islas lejanas pueden comportarse distinto: consultá también las escalas del INA.</p>
+</section>
+
+<section id="contactos" hidden>
+<div class="panel"><h2>Llamadas rápidas</h2>
+<ul class="list">
+<li><span class="who">Defensa Civil San Fernando<small>Atención las 24 h</small></span><a class="btn" href="tel:103">103</a></li>
+<li><span class="who">Atención vecinal San Fernando<small>0800-777-6864</small></span><a class="btn" href="tel:08007776864">Llamar</a></li>
+<li><span class="who">Prefectura Naval: emergencias<small>Solo para emergencias en el agua</small></span><a class="btn" href="tel:106">106</a></li>
+<li><span class="who">Prefectura: Comando Radioeléctrico<small>(011) 4576-7658</small></span><a class="btn" href="tel:+541145767658">Llamar</a></li>
+<li><span class="who">Prefectura: consultas generales<small>Lunes a viernes de 9 a 17 h. 4318-7400</small></span><a class="btn" href="tel:+541143187400">Llamar</a></li>
+<li><span class="who">Prefectura: 0800<small>0800-888-7730</small></span><a class="btn" href="tel:08008887730">Llamar</a></li>
+<li><span class="who">Emergencias en rutas concesionadas<small>Vialidad Nacional</small></span><a class="btn" href="tel:140">140</a></li>
+<li><span class="who">Atención al Usuario de Vialidad<small>0800-222-6272 y 0800-333-0073</small></span><a class="btn" href="tel:08002226272">Llamar</a></li>
+</ul>
+<p class="note">Fuentes: sitios oficiales de Prefectura Naval, Municipio de San Fernando y Vialidad Nacional, consultados en octubre de 2026. Los teléfonos pueden cambiar: verificalos.</p>
+</div>
+<div class="panel"><h2>Pendiente de cargar</h2>
+<p class="note" style="margin:0">Contactos de Defensa Civil de Tigre, Escobar y San Isidro, y la línea de consulta de altura del río si existe una específica.</p></div>
+</section>
+
+<section id="fuentes" hidden>
+<div class="panel"><h2>Altura y alertas</h2>
+<ul class="list">
+<li><span class="who">Prefectura Naval: estado de los ríos<small>Alturas observadas</small></span><a class="lk" href="https://contenidosweb.prefecturanaval.gob.ar/alturas/" target="_blank" rel="noopener">Abrir</a></li>
+<li><span class="who">Servicio de Hidrografía Naval: alturas horarias<small>Observado y alertas de crecida</small></span><a class="lk" href="https://www.hidro.gov.ar/oceanografia/AlturasHorarias.asp" target="_blank" rel="noopener">Abrir</a></li>
+<li><span class="who">Geoportal del SHN</span><a class="lk" href="https://geoportal.shn.gob.ar/#/geoportal" target="_blank" rel="noopener">Abrir</a></li>
+<li><span class="who">INA: Alerta Hidrológico Cuenca del Plata<small>Reporte diario y pronóstico del Paraná</small></span><a class="lk" href="https://www.ina.gov.ar/alerta/index.php" target="_blank" rel="noopener">Abrir</a></li>
+<li><span class="who">Servicio Meteorológico Nacional: alertas<small>Viento, tormentas y lluvia</small></span><a class="lk" href="https://www.smn.gob.ar/alertas" target="_blank" rel="noopener">Abrir</a></li>
+<li><span class="who">Windy<small>Viento y presión</small></span><a class="lk" href="https://www.windy.com" target="_blank" rel="noopener">Abrir</a></li>
+</ul></div>
+<div class="panel"><h2>Rutas y municipio</h2>
+<ul class="list">
+<li><span class="who">Estado de rutas nacionales<small>Vialidad Nacional</small></span><a class="lk" href="https://www.argentina.gob.ar/transporte/vialidad-nacional/estado-de-rutas" target="_blank" rel="noopener">Abrir</a></li>
+<li><span class="who">Defensa Civil de San Fernando</span><a class="lk" href="https://www.sanfernando.gob.ar/municipio/secretarias/secretaria-de-proteccion-ciudadana/direccion-de-defensa-civil" target="_blank" rel="noopener">Abrir</a></li>
+<li><span class="who">Prefectura Naval Argentina<small>Contactos y directorio de dependencias</small></span><a class="lk" href="https://www.argentina.gob.ar/prefecturanaval" target="_blank" rel="noopener">Abrir</a></li>
+</ul>
+<p class="note">Los puntos de evacuación y los cortes de calles los anuncia cada municipio. Esta página no los publica.</p></div>
+</section>
+
+<section id="plan" hidden>
+<div class="panel"><h2>Mi plan de evacuación</h2>
+<p class="note" style="margin-top:0">Se guarda solo en este dispositivo.</p>
+<label for="p1">Punto de encuentro</label><textarea id="p1"></textarea>
+<label for="p2">Ruta de salida principal</label><textarea id="p2"></textarea>
+<label for="p3">Ruta alternativa</label><textarea id="p3"></textarea>
+<label for="p4">Personas a avisar (nombre y teléfono)</label><textarea id="p4"></textarea>
+<label for="p5">Qué llevar (documentos, medicación, linterna)</label><textarea id="p5"></textarea>
+<button class="save" id="sv">Guardar plan</button> <span class="note" id="ok"></span>
+</div></section>
+
+<p class="warn">Herramienta orientativa. No reemplaza los avisos del SHN, del SMN ni de Defensa Civil. Ante una emergencia llamá al 103 o al 106.</p>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+function ld(k,d){try{var v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function num(s){var n=parseFloat(String(s).replace(",","."));return isNaN(n)?null:n}
+function fm(n){return n.toFixed(2).replace(".",",")}
+var ids=["act","pico","hora","u1","u2","u3"];
+var defs={u1:"2,50",u2:"3,00",u3:"3,50"};
+ids.forEach(function(i){$(i).value=ld("c_"+i,defs[i]||"");$(i).addEventListener("input",function(){sv("c_"+i,$(i).value);upd()})});
+$("sudeste").checked=ld("c_sud","0")==="1";
+$("sudeste").addEventListener("change",function(){sv("c_sud",$("sudeste").checked?"1":"0");upd()});
+
+var NS="http://www.w3.org/2000/svg";
+function el(t,a,txt){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);if(txt)e.textContent=txt;return e}
+function Y(m){return 290-m*65}
+function gauge(a,p,u){
+var g=$("g");g.innerHTML="";
+g.appendChild(el("rect",{x:50,y:Y(4),width:30,height:Y(0)-Y(4),"class":"tr"}));
+var top=Math.max(a===null?0:a,p===null?0:p);
+if(top>0)g.appendChild(el("rect",{x:50,y:Y(Math.min(top,4)),width:30,height:Y(0)-Y(Math.min(top,4)),"class":"wt"}));
+for(var m=0;m<=4;m+=0.5){g.appendChild(el("line",{x1:44,x2:50,y1:Y(m),y2:Y(m),"class":"tk"}));g.appendChild(el("text",{x:40,y:Y(m)+3,"text-anchor":"end","class":"lb"},fm(m)))}
+[[u[0],"#f2c230"],[u[1],"#d8641c"],[u[2],"#b3261e"]].forEach(function(t){g.appendChild(el("line",{x1:50,x2:84,y1:Y(t[0]),y2:Y(t[0]),stroke:t[1],"stroke-width":3}))});
+g.appendChild(el("text",{x:88,y:Y(u[1])+3,"class":"lb"},"Alerta"));
+g.appendChild(el("text",{x:88,y:Y(u[2])+3,"class":"lb"},"Evacuación"));
+if(a!==null){g.appendChild(el("circle",{cx:65,cy:Y(Math.min(a,4)),r:6,fill:"#1f6f7a",stroke:"#fff","stroke-width":2}));g.appendChild(el("text",{x:88,y:Y(Math.min(a,4))+3,"class":"lb"},"Ahora"))}
+if(p!==null){var yy=Y(Math.min(p,4));g.appendChild(el("polygon",{points:"58,"+(yy-6)+" 72,"+(yy-6)+" 65,"+(yy+6),fill:"#12262b",stroke:"#fff","stroke-width":1.5}));g.appendChild(el("text",{x:88,y:yy-8,"class":"lb"},"Pico"))}
+}
+var msg=[
+["Normal","Sin riesgo por altura con los datos cargados. Revisá igual el viento y la lluvia previstos."],
+["Atención","Condiciones favorables a una subida. Seguí los avisos del SHN y del municipio."],
+["Alerta","Se alcanza el umbral de alerta del INA. Prepará el traslado de vehículos y objetos de zonas bajas."],
+["Evacuación","Se alcanza el umbral de evacuación del INA. Seguí las indicaciones de Defensa Civil (103). Ante una emergencia en el agua, llamá al 106."]];
+function upd(){
+var a=num($("act").value),p=num($("pico").value);
+var u=[num($("u1").value)||2.5,num($("u2").value)||3,num($("u3").value)||3.5];
+gauge(a,p,u);
+var r=$("res"),t=$("tig");
+if(a===null&&p===null){r.className="res l0";r.innerHTML="<strong>Cargá un dato</strong><p>Escribí la altura actual o el pico previsto para ver el nivel.</p>";t.textContent="";return}
+var m=Math.max(a===null?-9:a,p===null?-9:p);
+var l=m>=u[2]?3:m>=u[1]?2:m>=u[0]?1:0;
+r.className="res l"+l;
+var x=msg[l][1];
+if($("sudeste").checked&&l<3&&m>=u[0]-0.3)x+=" Con viento sudeste sostenido la altura puede seguir subiendo.";
+r.innerHTML="<strong>"+msg[l][0]+": "+fm(m)+" m</strong><p>"+x+"</p>";
+var h=$("hora").value.match(/^(\d{1,2}):(\d{2})$/);
+if(h&&p!==null){var hh=(parseInt(h[1],10)+1)%24;t.textContent="Pico previsto de "+fm(p)+" m a las "+h[1].padStart(2,"0")+":"+h[2]+" en San Fernando. En Tigre y la primera sección del Delta, hacia las "+String(hh).padStart(2,"0")+":"+h[2]+"."}else t.textContent="";
+}
+upd();
+
+function fh(iso){try{return new Date(iso).toLocaleString("es-AR",{timeZone:"America/Argentina/Buenos_Aires",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}catch(e){return iso}}
+function esc(t){var d=document.createElement("div");d.textContent=t==null?"":t;return d.innerHTML}
+function datos(){
+fetch("datos.json?t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(d){
+var e=$("est"),a=d.shn_alturas||{},sf=null,from=a;
+if(!a.ok&&a.ultimo_ok){from=a.ultimo_ok}
+if(from&&from.datos)sf=from.datos["San Fernando"];
+if(!sf){e.textContent="No hay datos del SHN todavía"+(a.error?" ("+a.error+")":"")+". Podés cargar la altura a mano.";return}
+var edad=(Date.now()-new Date(sf.fecha).getTime())/36e5;
+$("act").value=fm(sf.actual);sv("c_act",$("act").value);
+var txt="SHN, San Fernando: "+fm(sf.actual)+" m a las "+fh(sf.fecha)+".";
+if(!a.ok)txt+=" La última consulta falló; se muestra la última lectura buena.";
+if(edad>3)txt+=" Atención: la lectura tiene "+Math.round(edad)+" h de atraso.";
+e.textContent=txt;
+var s=sf.serie;
+if(s&&s.length>=4){var df=s[s.length-1][1]-s[s.length-4][1];
+$("tend").textContent="Tendencia en las últimas 3 horas: "+(Math.abs(df)<0.05?"estable":df>0?"subiendo "+fm(df)+" m":"bajando "+fm(-df)+" m")+". El pico previsto sale de los avisos del SHN."}
+var h="",av=(d.shn_avisos&&(d.shn_avisos.datos||(d.shn_avisos.ultimo_ok&&d.shn_avisos.ultimo_ok.datos)))||[];
+var rel=av.filter(function(i){return /crecida|sudestada|alerta|aviso/i.test(i.titulo+" "+i.texto)}).slice(0,3);
+if(rel.length){h+="<h2 style=\"margin-top:14px\">Avisos del SHN</h2><ul class=\"list\">";rel.forEach(function(i){h+="<li><span class=\"who\">"+esc(i.titulo)+"<small>"+esc(i.texto)+"</small></span>"+(i.enlace?"<a class=\"lk\" href=\""+esc(i.enlace)+"\" target=\"_blank\" rel=\"noopener\">Abrir</a>":"")+"</li>"});h+="</ul>"}
+var ina=(d.ina&&(d.ina.datos||(d.ina.ultimo_ok&&d.ina.ultimo_ok.datos)))||[];
+if(ina.length){h+="<h2 style=\"margin-top:14px\">INA, últimas novedades</h2><ul class=\"list\">";ina.slice(0,3).forEach(function(i){h+="<li><span class=\"who\">"+esc(i.titulo)+"<small>"+esc(i.fecha)+"</small></span>"+(i.enlace?"<a class=\"lk\" href=\""+esc(i.enlace)+"\" target=\"_blank\" rel=\"noopener\">Abrir</a>":"")+"</li>"});h+="</ul>"}
+$("avisos").innerHTML=h;
+upd();
+}).catch(function(){$("est").textContent="No se pudieron leer los datos oficiales. Cargá la altura a mano o reintentá."});
+}
+datos();setInterval(datos,600000);
+
+var tabs=document.querySelectorAll("nav button");
+tabs.forEach(function(b){b.addEventListener("click",function(){
+tabs.forEach(function(o){o.setAttribute("aria-selected",o===b?"true":"false");$(o.dataset.t).hidden=o!==b})})});
+["p1","p2","p3","p4","p5"].forEach(function(i){$(i).value=ld("p_"+i,"")});
+$("sv").addEventListener("click",function(){["p1","p2","p3","p4","p5"].forEach(function(i){sv("p_"+i,$(i).value)});$("ok").textContent="Plan guardado en este dispositivo.";setTimeout(function(){$("ok").textContent=""},3000)});
+</script>
+</body>
+</html>
